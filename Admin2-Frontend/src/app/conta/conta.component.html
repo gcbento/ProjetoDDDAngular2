@@ -1,0 +1,257 @@
+<h2 class="title">{{title}}</h2>
+<div class="row">
+    <div class="col-md-12">
+        <div class="content-box-large">
+            <div class="form-group">
+                <label for="">Pesquisa</label>
+                <input type="text" class="form-control" [(ngModel)]="filter.text" (keyup)="pesquisa()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<simple-notifications></simple-notifications>
+
+<div bsModal #contaModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Cadastro Compras</h4>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="contaForm" (ngSubmit)="save()">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div *ngIf="!conta.id > 0" class="form-group" [class.has-error]="hasError(contaForm.controls['selectJogos'])">
+                                <label>Jogo</label>
+                                <ng-select placeholder="Selecione" [(ngModel)]="compra.id" name="selectJogos" [options]="jogosOptions" [allowClear]="true"
+                                    formControlName="selectJogos"></ng-select>
+                            </div>
+                            <div class="form-group" [class.has-error]="hasError(contaForm.controls['email'])">
+                                <label>Email</label>
+                                <input class="form-control" type="text" [(ngModel)]="conta.email" name="email" formControlName="email">
+                            </div>
+                            <div class="form-group" [class.has-error]="hasError(contaForm.controls['senha'])">
+                                <label>Senha</label>
+                                <input class="form-control" type="text" [(ngModel)]="conta.senha" name="senha" formControlName="senha">
+                            </div>
+                            <div class="form-group" [class.has-error]="hasError(contaForm.controls['idOnline'])">
+                                <label>ID Online</label>
+                                <input class="form-control" type="text" [(ngModel)]="conta.idOnline" name="idOnline" formControlName="idOnline">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" [class.has-error]="hasError(contaForm.controls['tipoContaId'])">
+                                <label>Tipo Conta</label>
+                                <select class="form-control" [(ngModel)]="conta.tipoConta.id" name="tipoContaId" formControlName="tipoContaId">
+                                    <option value="1">Completa</option>
+                                    <option value="2">Primária</option>
+                                    <option value="3">Secundária</option>
+                                </select>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" [class.has-error]="hasError(contaForm.controls['dataNascimento'])">
+                                        <label>Data Nascimento</label>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <datepicker-ionic [(ngModel)]="conta.dataNascimento" name="dataNascimento" formControlName="dataNascimento" singleSelect
+                                                    viewFormat="DD/MM/YYYY" [expanded]="true"></datepicker-ionic>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" [class.has-error]="hasError(contaForm.controls['dataDesativacao'])">
+                                        <label>Data Desativação</label>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <datepicker-ionic [(ngModel)]="conta.dataDesativacao" name="dataDesativacao" formControlName="dataDesativacao" singleSelect
+                                                    viewFormat="DD/MM/YYYY" [expanded]="true"></datepicker-ionic>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="!conta.codigos.length > 0" class="form-group" [class.has-error]="hasError(contaForm.controls['codigos'])">
+                                <label>Codigos</label>
+                                <textarea class="form-control" rows="4" [(ngModel)]="codigosConta.descricao" name="codigos" formControlName="codigos"></textarea>
+                            </div>
+                            <div *ngIf="conta.id > 0" class="checkbox">
+                                <label>
+                                    <input type="checkbox" [(ngModel)]="conta.ativa" name="ativa" formControlName="ativa"> Ativa
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-actions">
+                        <button type="button" class="btn btn-default" (click)="hideModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" [disabled]="!contaForm.valid">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #jogosModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Jogos</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Jogo</label>
+                            <ng-select placeholder="Selecione" [(ngModel)]="jogosConta.jogoId" name="selectJogos" [options]="jogosOptions" [allowClear]="true">
+                            </ng-select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <br>
+                        <button type="button" class="btn btn-primary" (click)="addJogo()">Add Jogo</button>
+                    </div>
+                </div>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Jogo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let item of listJogos">
+                            <td><button class="btn-link" (click)="removerJogo(item.id)"><i class="fa fa-close alert-danger"></i></button></td>
+                            <td>{{item.descricao}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" (click)="hideModal()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #codigosModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Codigos</h4>
+            </div>
+            <div class="modal-body">
+                <div *ngIf="!listCodigos.length > 0">
+                    <h4>Não há códigos cadastrado nesta conta.</h4>
+                </div>
+                <div *ngIf="listCodigos.length > 0">
+                    <button class="btn btn-danger" (click)="deleteCodigos()"><i class="fa fa-close"></i> 
+                         Excluir todos os Códigos
+                    </button>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Código</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of listCodigos">
+                                <td>{{item.id}}</td>
+                                <td>{{item.descricao}}</td>
+                                <td><button class="btn-link" (click)="updateCodigos(item)" [innerHtml]="bindIconStatus(item.status)"></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" (click)="hideModal()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #confirmaDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Delete conta</h4>
+            </div>
+            <div class="modal-body">
+                Deseja realmente exluir a conta?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" (click)="hideModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" (click)="delete()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <button type="button" class="btn btn-primary" (click)="showContaModal()"><i class="fa fa-shopping-cart"></i> Add Compra</button>
+        <div class="content-box-large">
+            <table class="table table-hover" [mfData]="listContas" #mf="mfDataTable" [mfRowsOnPage]="10">
+                <thead>
+                    <tr>
+                        <th>
+                            <mfDefaultSorter by="id">Id</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="email">Email</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="senha">Senha</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="idOnline">ID Online</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="descricao">Jogo</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="dataDesativacao">Data Desativação</mfDefaultSorter>
+                        </th>
+                        <th><mfDefaultSorter by="ativa">Ativa</mfDefaultSorter></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of mf.data">
+                        <td>{{item.id}}</td>
+                        <td>{{item.email}}</td>
+                        <td>{{item.senha}}</td>
+                        <td>{{item.idOnline}}</td>
+                        <td>{{item.jogos[0]?.descricao}}</td>
+                        <td>{{item.dataDesativacao | amDateFormat:'DD/MM/YYYY'}}</td>
+                        <td>
+                            <div [innerHtml]="bindIconStatus(item.ativa)"></div>
+                        </td>
+                        <td>
+                            <a class="btn-link" (click)="showContaModal(item)" tooltip="Editar"><i class="fa fa-edit blue"></i></a>
+                            <a class="btn-link" (click)="showConfirmeDeleteModal(item.id)" tooltip="Excluir"><i class="fa fa-remove red"></i></a>
+                            <a class="btn-link" (click)="showJogosModal(item.id, item.jogos)" tooltip="Jogos"><i class="fa fa-gamepad maroon"></i></a>
+                            <a class="btn-link" (click)="showCodigosModal(item.id, item.codigos)" tooltip="Códigos"><i class="fa fa-list black"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="8">
+                            <mfBootstrapPaginator [rowsOnPageSet]="[10,25,50]"></mfBootstrapPaginator>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

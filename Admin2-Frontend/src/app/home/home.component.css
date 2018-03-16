@@ -1,0 +1,13 @@
+.badge{
+    background-color: #ff4642;
+}
+
+.panel-saldo{
+    padding: 0px 0px 0px 15px;
+}
+
+.saldo-mes{
+    background-color: #ccc;
+    border-right: 1px solid;
+    padding: 19px   
+}

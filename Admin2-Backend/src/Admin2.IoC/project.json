@@ -1,0 +1,17 @@
+{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "Admin2.AppServices": "1.0.0-*",
+    "Admin2.Data": "1.0.0-*",
+    "Admin2.Domain": "1.0.0-*",
+    "NETStandard.Library": "1.6.0",
+    "Microsoft.Extensions.DependencyInjection.Abstractions": "1.0.0"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50"
+    }
+  }
+}

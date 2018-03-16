@@ -1,0 +1,183 @@
+<h2 class="title">{{title}} -
+  <span [ngClass]="getClassSaldo(estatisticas.valorTotalVendas - estatisticas.valorTotalCompras)">
+        {{estatisticas.valorTotalVendas - estatisticas.valorTotalCompras | currency:'BRL':true}}
+    </span>
+</h2>
+
+<div bsModal #detalhesSaldoMensalModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Detalhes</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div *ngFor="let vendasContas of vendasMensal" class="col-md-12">
+            <div class="panel panel-default">
+              <div class="panel-heading">{{vendasContas[0].conta?.jogos[0]?.descricao}}</div>
+              <div class="panel-body">
+                
+              </div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Tipo Venda</th>
+                    <th>Valor</th>
+                    <th>Data Venda</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of vendasContas">
+                    <td>{{item.tipoVenda.descricao}}</td>
+                    <td>{{item.valor | currency:'BRL':true}}</td>
+                    <td>{{item.venda.dataVenda | amDateFormat:'DD/MM/YYYY'}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" (click)="hideModal()">Ok</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading btn-link" (click)="isPanelVendasCollapsed = !isPanelVendasCollapsed">
+        <div class="row">
+          <div class="col-md-3">
+            Vendas
+          </div>
+          <div class="col-md-5">
+            Valor Total: {{estatisticas.valorTotalVendas | currency:'BRL':true}}
+          </div>
+          <div class="col-md-4">
+            Qtde: {{estatisticas.qtdeTotalVendas}}
+          </div>
+        </div>
+      </div>
+      <div class="row" [collapse]="isPanelVendasCollapsed">
+        <div class="col-md-12">
+          <table class="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Vendas</th>
+                <th>Alugueis</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Valor</td>
+                <td>{{estatisticas.valorVendas | currency:'BRL':true}}</td>
+                <td>{{estatisticas.valorAlugueis | currency:'BRL':true}}</td>
+              </tr>
+              <tr>
+                <td>Qtde</td>
+                <td>{{estatisticas.qtdeVendas}}</td>
+                <td>{{estatisticas.qtdeAlugueis}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <div class="row">
+          <div class="col-md-3">
+            Compras
+          </div>
+          <div class="col-md-5">
+            Valor Total: {{estatisticas.valorTotalCompras | currency:'BRL':true}}
+          </div>
+          <div class="col-md-4">
+            Qtde: {{estatisticas.qtdeTotalCompras}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="content-box-large">
+          <div class="form-group">
+            <label for="">Ano</label>
+            <select class="form-control" #select (change)="pesquisa(select.value)">
+                <option value="0">Selecione</option>
+                <option value="2015">2015</option>
+                <option value="2016">2016</option>
+                <option value="2017">2017</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <tabset type="tabs">
+      <tab>
+        <template tabHeading>
+          Gráfico
+        </template>
+        <chart [options]="options"></chart>
+      </tab>
+      <tab>
+        <template tabHeading>
+          Estatisticas
+        </template>
+        <div class="content-box-large">
+          <h4 class="text-center">{{ano}}</h4>
+          <table class="table table-condensed table-striped table-hover">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Vendas</th>
+                <th>Alugueis</th>
+                <th>Total</th>
+                <th>Vendas</th>
+                <th>Alugueis</th>
+                <th>Total</th>
+                <th>Compras</th>
+                <th>Total</th>
+                <th>Saldo</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of saldoMensal">
+                <td><b>{{item.mes}}</b></td>
+                <td>{{item.valorVendas | currency:'BRL':true}}</td>
+                <td>{{item.valorAlugueis | currency:'BRL':true}}</td>
+                <td><b>{{item.valorTotalVendas | currency:'BRL':true}}</b></td>
+                <td>{{item.qtdeVendas}}</td>
+                <td>{{item.qtdeAlugueis}}</td>
+                <td><b>{{item.qtdeTotalVendas}}</b></td>
+                <td>{{item.valorTotalCompras | currency:'BRL':true}}</td>
+                <td>{{item.qtdeTotalCompras}}</td>
+                <td>
+                  <h4><b [ngClass]="getClassSaldo(item.saldo)">{{item.saldo | currency:'BRL':true}}</b></h4>
+                </td>
+                <td>
+                  <button class="btn-link" (click)="showDetalhesSaldoMensalModal(item.mes)" tooltip="Detalhes"><i class="fa fa-file-text-o"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </tab>
+    </tabset>
+  </div>
+</div>

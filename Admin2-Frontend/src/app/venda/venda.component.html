@@ -1,0 +1,355 @@
+<h2 class="title">{{title}}</h2>
+<div class="row">
+    <div class="col-md-12">
+        <div class="content-box-large">
+            <div class="form-group">
+                <label for="">Pesquisa</label>
+                <input type="text" class="form-control" [(ngModel)]="filter.text" (keyup)="pesquisa()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<simple-notifications></simple-notifications>
+
+<div bsModal #detalhesVendaModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Detalhes</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        Data Venda:
+                        <h4><b>{{venda.dataVenda | amDateFormat:'DD/MM/YYYY'}}</b></h4>
+                    </div>
+                    <div class="col-md-4">
+                        Tipo Venda:
+                        <h4><b>{{venda.itensVenda[0]?.tipoVenda.descricao}}</b></h4>
+                    </div>
+                    <div class="col-md-4">
+                        Valor:
+                        <h4><b>{{venda.valor | currency:'BRL':true}}</b></h4>
+                    </div>
+                </div><br>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p>Jogo: <b>{{venda.itensVenda[0]?.conta?.jogos[0]?.descricao}}</b></p>
+                        <p>Email Conta: <b>{{venda.itensVenda[0]?.conta?.email}}</b></p>
+                    </div>
+                    <div class="col-md-6">
+                        <p>Cliente: <b>{{venda.cliente.nome}}</b></p>
+                        <p>Tipo Conta: <b>{{venda.itensVenda[0]?.tipoConta.descricao}}</b></p>
+                    </div>
+                </div><br>
+                <div *ngIf="venda.itensVenda[0]?.tipoVenda.id == 2" class="row">
+                    <div class="col-md-4">
+                        <p>Qtde dias: <b>{{venda.itensVenda[0]?.qtdeDias}}</b></p>
+                        <p>Inicio Locação: <b>{{venda.itensVenda[0]?.inicioLocacao| amDateFormat:'DD/MM/YYYY'}}</b></p>
+                        <p>Fim Locação: <b>{{venda.itensVenda[0]?.fimLocacao| amDateFormat:'DD/MM/YYYY'}}</b></p>
+                    </div>
+                    <div class="col-md-8" *ngIf="checkDataLocacao(venda.itensVenda[0]?.fimLocacao)">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-primary" (click)="isEstenderLocacao = !isEstenderLocacao">Estender Locação</button>
+                                <div class="row" [collapse]="isEstenderLocacao">
+                                    <div class="form-group col-md-6">
+                                        <label>Qtde dias</label>
+                                        <input class="form-control" type="text" name="qtdeDias" [(ngModel)]="itemVenda.qtdeDias">
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>Valor</label>
+                                        <input class="form-control" type="text" name="valor" [(ngModel)]="itemVenda.valor">
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit" class="btn btn-primary" (click)="estenderLocacao()">Confimar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-primary" (click)="showFinalizarLocModal(venda.itensVenda[0].id)">Finalizar Locação</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" (click)="hideModal()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #confirmaFinalizarLocacao="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideFinalizarModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Finalizar Locação</h4>
+            </div>
+            <div class="modal-body">
+                Deseja realmente finalizar esta locacão?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" (click)="hideFinalizarModal()">Não</button>
+                <button type="button" class="btn btn-primary" (click)="finalizarLocacao()">Sim</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #vendaModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Cadastro Vendas</h4>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="vendaForm" (ngSubmit)="save()">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group" [class.has-error]="hasError(vendaForm.controls['selectJogos'])">
+                                <label>Jogo</label>
+                                <ng-select placeholder="Selecione" name="selectJogos" [options]="jogosOptions" [allowClear]="true" (selected)="onSelectJogo($event)"
+                                    formControlName="selectJogos"></ng-select>
+                            </div>
+                            <div *ngIf="contas.length > 0" class="form-group">
+                                <div class="radio" *ngFor="let co of contas">
+                                    <label>
+                                        <input type="radio" formControlName="contaId" value="{{co.id}}" (click)="checkRadioConta(co)">
+                                        {{co.email}} 
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" [class.has-error]="hasError(vendaForm.controls['tipoContaId'])">
+                                        <label>Tipo Conta</label>
+                                        <select class="form-control" [(ngModel)]="itemVenda.tipoConta.id" name="tipoContaId" formControlName="tipoContaId">
+                                            <option value="1">Completa</option>
+                                            <option value="2">Primária</option>
+                                            <option value="3">Secundária</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" [class.has-error]="hasError(vendaForm.controls['tipoVendaId'])">
+                                        <label>Tipo Venda</label>
+                                        <select class="form-control" [(ngModel)]="itemVenda.tipoVenda.id" name="tipoVendaId" formControlName="tipoVendaId">
+                                            <option value="1">Venda</option>
+                                            <option value="2">Locação</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" [class.has-error]="hasError(vendaForm.controls['valor'])">
+                                <label>Valor</label>
+                                <input class="form-control" type="text" [(ngModel)]="itemVenda.valor" name="valor" formControlName="valor">
+                                <p *ngIf="vendaForm.controls['valor'].errors?.number">Somente números</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Senha</label>
+                                <div class="input-group">
+                                    <input class="form-control" type="text" [(ngModel)]="itemVenda.senha" name="senha" formControlName="senha">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" (click)="gerarSenha()">Gerar senha</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" [class.has-error]="hasError(vendaForm.controls['dataVenda'])">
+                                <label>Data Venda</label>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <datepicker-ionic [(ngModel)]="venda.dataVenda" name="dataVenda" formControlName="dataVenda" singleSelect viewFormat="DD/MM/YYYY"
+                                            [expanded]="true"></datepicker-ionic>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" [class.has-error]="hasError(vendaForm.controls['selectClientes'])">
+                                <label>Cliente</label>
+                                <ng-select placeholder="Selecione" [(ngModel)]="venda.cliente.id" name="selectClientes" [options]="clienteOptions" [allowClear]="true"
+                                    formControlName="selectClientes"></ng-select>
+                            </div>
+                            <div *ngIf="itemVenda.tipoVenda.id == 2" class="form-group">
+                                <label>Qtde dias</label>
+                                <select class="form-control" [(ngModel)]="itemVenda.tipoPeriodo" name="tipoPeriodo" formControlName="tipoPeriodo">
+                                    <option value="dias">Dias</option>
+                                    <option value="mes">Mes</option>
+                                </select>
+                            </div>
+                            <div *ngIf="itemVenda.tipoVenda.id == 2" class="form-group">
+                                <label>Qtde dias</label>
+                                <input class="form-control" type="text" [(ngModel)]="itemVenda.qtdeDias" name="qtdeDias" formControlName="qtdeDias">
+                                <p *ngIf="vendaForm.controls['qtdeDias'].errors?.number">Somente números</p>
+                            </div>
+                            <div *ngIf="itemVenda.tipoVenda.id == 2" class="checkbox">
+                                <label>
+                                    <input type="checkbox" [(ngModel)]="itemVenda.diasGratis" name="diasGratis" formControlName="diasGratis"> Dias Grátis
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-actions">
+                        <button type="button" class="btn btn-default" (click)="hideModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" [disabled]="!vendaForm.valid">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #updateVendaModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Cadastro Vendas</h4>
+            </div>
+            <div class="modal-body">
+                <form (ngSubmit)="save()">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Tipo Conta</label>
+                                        <select class="form-control" [(ngModel)]="itemVenda.tipoConta.id" name="tipoContaId">
+                                            <option value="1">Completa</option>
+                                            <option value="2">Primária</option>
+                                            <option value="3">Secundária</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Tipo Venda</label>
+                                        <select class="form-control" [(ngModel)]="itemVenda.tipoVenda.id" name="tipoVendaId">
+                                            <option value="1">Venda</option>
+                                            <option value="2">Locação</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Valor</label>
+                                <input class="form-control" type="text" [(ngModel)]="itemVenda.valor" name="valor">
+                                <p *ngIf="vendaForm.controls['valor'].errors?.number">Somente números</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Senha</label>
+                                <div class="input-group">
+                                    <input class="form-control" type="text" [(ngModel)]="itemVenda.senha" name="senha">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button" (click)="gerarSenha()">Gerar senha</button>
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Data Venda</label>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <datepicker-ionic [(ngModel)]="venda.dataVenda" name="dataVenda" singleSelect viewFormat="DD/MM/YYYY" [expanded]="true"></datepicker-ionic>
+                                    </div>
+                                </div>
+                            </div>
+                            <div *ngIf="itemVenda.tipoVenda.id == 2" class="form-group">
+                                <label>Qtde dias</label>
+                                <input class="form-control" type="text" [(ngModel)]="itemVenda.qtdeDias" name="qtdeDias">
+                            </div>
+                            <div *ngIf="itemVenda.tipoVenda.id == 2" class="checkbox">
+                                <label>
+                                    <input type="checkbox" [(ngModel)]="itemVenda.diasGratis" name="diasGratis"> Dias Grátis
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group form-actions">
+                        <button type="button" class="btn btn-default" (click)="hideModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #confirmaDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Cadastro Compras</h4>
+            </div>
+            <div class="modal-body">
+                Deseja realmente exluir a compra?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" (click)="hideModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" (click)="delete()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <button type="button" class="btn btn-primary" (click)="showVendaModal()"><i class="fa fa-shopping-cart"></i> Add Venda</button>
+        <div class="content-box-large">
+            Total encontrado: <b>{{listVendas.length}}</b>
+            <table class="table table-hover" [mfData]="listVendas" #mf="mfDataTable" [mfRowsOnPage]="10">
+                <thead>
+                    <tr>
+                        <th>
+                            <mfDefaultSorter by="cliente.nome">Cliente</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="valor">Valor</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="dataVenda">Data Venda</mfDefaultSorter>
+                        </th>
+                        <th>Tipo Venda</th>
+                        <th>Jogo</th>
+                        <th>Email</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                
+                    <tr *ngFor="let item of mf.data">
+                        <td>{{item.cliente.nome | tamText}}</td>
+                        <td>{{item.valor | currency:'BRL':true}}</td>
+                        <td>{{item.dataVenda | amDateFormat:'DD/MM/YYYY'}}</td>
+                        <td>{{item.itensVenda[0]?.tipoVenda.descricao}}</td>
+                        <td>{{item.itensVenda[0]?.conta.jogos[0]?.descricao}}</td>
+                        <td>{{item.itensVenda[0]?.conta.email}}</td>
+                        <td>
+                            <a class="btn-link" (click)="showDetalhesVendaModal(item)" tooltip="Detalhes"><i class="fa fa-file-text-o maroon"></i></a>
+                            <a class="btn-link" (click)="showUpdateVendaModal(item)" tooltip="Editar"><i class="fa fa-edit blue"></i></a>
+                            <a class="btn-link" (click)="showConfirmeDeleteModal(item.id)" tooltip="Excluir"><i class="fa fa-remove red"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="7">
+                            <mfBootstrapPaginator [rowsOnPageSet]="[10,25,50]"></mfBootstrapPaginator>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

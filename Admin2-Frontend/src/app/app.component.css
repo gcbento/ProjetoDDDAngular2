@@ -1,0 +1,15 @@
+.sub-menu{
+padding-left: 33px;
+}
+
+.sub-menu a{
+    display: list-item;
+    line-height: 30px;
+    color: #999;
+    font-weight: bold;
+    
+}
+
+.sidebar .nav li a:hover{
+    text-decoration: none;
+}

@@ -1,0 +1,190 @@
+<h2 class="title">{{title}}</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="content-box-large">
+            <div class="form-group">
+                <label for="">Pesquisa</label>
+                <input type="text" class="form-control" [(ngModel)]="filter.text" (keyup)="pesquisa()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #detalhesVendasModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Detalhes</h4>
+            </div>
+            <div class="modal-body" *ngIf="itensVenda.length > 0">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="well">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <a href="#" class="thumbnail">
+                                        <img src="./assets/img/{{conta?.jogos[0]?.descricao | nomeImg}}.jpg">
+                                    </a>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th>Vendas</th>
+                                                <th>Alugueis</th>
+                                                <th>Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>Valor</td>
+                                                <td>{{estatisticas.valorVendas | currency:'BRL':true:'1.2-2'}}</td>
+                                                <td>{{estatisticas.valorAlugueis | currency:'BRL':true:'1.2-2'}}</td>
+                                                <td>{{estatisticas.valorVendas + estatisticas.valorAlugueis | currency:'BRL':true:'1.2-2'}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Qtde</td>
+                                                <td>{{estatisticas.qtdeVendas}}</td>
+                                                <td>{{estatisticas.qtdeAlugueis}}</td>
+                                                <td>{{estatisticas.qtdeVendas + estatisticas.qtdeAlugueis}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col-md-4">
+                                    <h4><b>{{conta?.email}}</b></h4>
+                                    <h5>Id Online: <b>{{conta?.idOnline}}</b></h5>
+                                    <h5>Senha: <b>{{conta?.senha}}</b></h5>
+                                    <h5>Valor Pago: <b>{{conta?.jogos[0]?.valor | currency:'BRL':true:'1.2-2'}}</b></h5>
+                                    <h4>
+                                        Lucro:
+                                        <span [ngClass]="getClassSaldo((estatisticas.valorVendas + estatisticas.valorAlugueis) - conta?.jogos[0]?.valor)">
+                                            {{(estatisticas.valorVendas + estatisticas.valorAlugueis) - conta?.jogos[0]?.valor | currency:'BRL':true:'1.2-2'}}
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <table class="table table-hover" [mfData]="itensVenda" #mf="mfDataTable" [mfRowsOnPage]="10">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <mfDefaultSorter by="descricao">Tipo Conta</mfDefaultSorter>
+                                    </th>
+                                    <th>
+                                        <mfDefaultSorter by="valorPago">Tipo Venda</mfDefaultSorter>
+                                    </th>
+                                    <th>
+                                        <mfDefaultSorter by="totalVendido">Cliente</mfDefaultSorter>
+                                    </th>
+                                    <th>
+                                        <mfDefaultSorter by="totalVendido">Valor</mfDefaultSorter>
+                                    </th>
+                                    <th>
+                                        <mfDefaultSorter by="totalVendido">Data Venda</mfDefaultSorter>
+                                    </th>
+                                    <th>
+                                        <mfDefaultSorter by="totalVendido">Qtde dias</mfDefaultSorter>
+                                    </th>
+                                    <th>
+                                        <mfDefaultSorter by="totalVendido">Início Locação</mfDefaultSorter>
+                                    </th>
+                                    <th>
+                                        <mfDefaultSorter by="totalVendido">Fim Locação</mfDefaultSorter>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of mf.data">
+                                    <td>{{item.tipoConta.descricao}}</td>
+                                    <td>{{item.tipoVenda.descricao}}</td>
+                                    <td>{{item.venda.cliente.nome}}</td>
+                                    <td>{{item.valor | currency:'BRL':true}}</td>
+                                    <td>{{item.venda.dataVenda | amDateFormat:'DD/MM/YYYY'}}</td>
+                                    <td>{{item.qtdeDias | checkEmptyValue}}</td>
+                                    <td>{{item.inicioLocacao | amDateFormat:'DD/MM/YYYY' | checkEmptyValue}}</td>
+                                    <td>{{item.fimLocacao | amDateFormat:'DD/MM/YYYY' | checkEmptyValue}}</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="8">
+                                        <mfBootstrapPaginator [rowsOnPageSet]="[10, 25, 50]"></mfBootstrapPaginator>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" (click)="hideModal()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="content-box-large">
+            <table class="table table-hover" [mfData]="saldoContas" #mf="mfDataTable" [mfRowsOnPage]="10">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>
+                            <mfDefaultSorter by="descricao">Email</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="valorPago">Valor Pago</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="totalVendido">Valor Total Vendido</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="saldo">Saldo</mfDefaultSorter>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of mf.data">
+                        <td><img src="./assets/img/{{item.conta?.jogos[0]?.descricao | nomeImg}}.jpg"></td>
+                        <td>{{item.conta?.email}}</td>
+                        <td>{{item.conta?.jogos[0]?.valor | currency:'BRL':true}}</td>
+                        <td>{{item.totalVendido | currency:'BRL':true}}</td>
+                        <td>
+                            <h4>
+                                <!--<span [ngClass]="getClassSaldo(item.totalVendido - item.conta?.jogos[0]?.valor)">
+                                  {{item.totalVendido - item.conta?.jogos[0]?.valor | currency:'BRL':true:'1.2-2'}}
+                                </span>-->
+                                <span [ngClass]="getClassSaldo(item.saldo)">
+                                  {{item.saldo | currency:'BRL':true:'1.2-2'}}
+                                </span>
+                            </h4>
+                        </td>
+                        <td>
+                            <button class="btn-link" (click)="showDetalhesVendasModal(item.conta)" tooltip="Detalhes">
+                                <i class="fa fa-file-text-o blue"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="6">
+                            <mfBootstrapPaginator [rowsOnPageSet]="[10, 25, 50]"></mfBootstrapPaginator>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

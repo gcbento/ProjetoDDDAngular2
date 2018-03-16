@@ -1,0 +1,96 @@
+<h2 class="title">Cliente</h2>
+<div class="row">
+  <div class="col-md-12">
+    <div class="content-box-large">
+      <div class="form-group">
+        <label for="">Pesquisa</label>
+        <input type="text" class="form-control" [(ngModel)]="filter.text" (keyup)="pesquisa()" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<simple-notifications></simple-notifications>
+
+<div bsModal #clienteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Cadastro Cliente</h4>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="clienteForm" (ngSubmit)="save()">
+          <div class="form-group" [class.has-error]="hasError(clienteForm.controls['nome'])">
+            <label>Nome</label>
+            <input class="form-control" type="text" [(ngModel)]="cliente.nome" name="nome" formControlName="nome">
+          </div>
+          <div class="form-group" [class.has-error]="hasError(clienteForm.controls['email'])">
+            <label>Email</label>
+            <input class="form-control" type="text" [(ngModel)]="cliente.email" name="email" formControlName="email">
+          </div>
+
+          <div class="form-group form-actions">
+            <button type="button" class="btn btn-default" (click)="hideModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" [disabled]="!clienteForm.valid">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #confirmaDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Cadastro Compras</h4>
+      </div>
+      <div class="modal-body">
+        Deseja realmente exluir o cliente?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" (click)="hideModal()">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="delete()">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <button type="button" class="btn btn-primary" (click)="showClienteModal()"><i class="fa fa-shopping-cart"></i> Add Cliente</button>
+    <div class="content-box-large">
+      <table class="table table-hover" [mfData]="listClientes" #mf="mfDataTable" [mfRowsOnPage]="10">
+        <thead>
+          <tr>
+            <th>
+              <mfDefaultSorter by="nome">Nome</mfDefaultSorter>
+            </th>
+            <th>
+              <mfDefaultSorter by="email">Email</mfDefaultSorter>
+            </th>
+            <th></th>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of mf.data">
+            <td>{{item.nome}}</td>
+            <td>{{item.email}}</td>
+            <td>
+              <a class="btn-link" (click)="showClienteModal(item)" tooltip="Editar"><i class="fa fa-edit blue"></i></a>
+              <a class="btn-link" (click)="showConfirmeDeleteModal(item.id)" tooltip="Excluir"><i class="fa fa-remove red"></i></a>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="4">
+              <mfBootstrapPaginator [rowsOnPageSet]="[10,25,50]"></mfBootstrapPaginator>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>

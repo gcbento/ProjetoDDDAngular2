@@ -1,0 +1,102 @@
+<h2 class="title">{{title}}</h2>
+<div class="row">
+    <div class="col-md-12">
+        <div class="content-box-large">
+            <div class="form-group">
+                <label for="">Pesquisa</label>
+                <input type="text" class="form-control" [(ngModel)]="filter.text" (keyup)="pesquisa()" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<simple-notifications></simple-notifications>
+
+<div bsModal #compraModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Cadastro Compras</h4>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="compraForm" (ngSubmit)="save()">
+                    <div class="form-group" [class.has-error]="hasError(compraForm.controls['descricao'])">
+                        <label>Descricao</label>
+                        <input class="form-control" type="text" [(ngModel)]="compra.descricao" name="descricao" formControlName="descricao">
+                    </div>
+                    <div class="form-group" [class.has-error]="hasError(compraForm.controls['valor'])">
+                        <label>Valor</label>
+                        <input class="form-control" type="text" [(ngModel)]="compra.valor" name="valor" formControlName="valor">
+                        <p *ngIf="compraForm.controls['valor'].errors?.number">Somente números</p>
+                    </div>
+
+                    <div class="form-group form-actions">
+                        <button type="button" class="btn btn-default" (click)="hideModal()">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" [disabled]="!compraForm.valid">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div bsModal #confirmaDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Cadastro Compras</h4>
+            </div>
+            <div class="modal-body">
+                Deseja realmente exluir a compra?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" (click)="hideModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" (click)="delete()">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <button type="button" class="btn btn-primary" (click)="showCompraModal()"><i class="fa fa-shopping-cart"></i> Add Compra</button>
+        <div class="content-box-large">
+            <table class="table table-hover" [mfData]="listCompra" #mf="mfDataTable" [mfRowsOnPage]="10">
+                <thead>
+                    <tr>
+                        <th>
+                            <mfDefaultSorter by="descricao">Descricao</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="valor">Valor</mfDefaultSorter>
+                        </th>
+                        <th>
+                            <mfDefaultSorter by="dataCompra">Data Compra</mfDefaultSorter>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of mf.data">
+                        <td>{{item.descricao}}</td>
+                        <td>{{item.valor | currency:'BRL':true}}</td>
+                        <td>{{item.dataCompra | amDateFormat:'DD/MM/YYYY'}}</td>
+                        <td>
+                            <a class="btn-link" (click)="showCompraModal(item)" tooltip="Editar"><i class="fa fa-edit blue"></i></a>
+                            <a class="btn-link" (click)="showConfirmeDeleteModal(item.id)" tooltip="Remover"><i class="fa fa-remove red"></i></a>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4">
+                            <mfBootstrapPaginator [rowsOnPageSet]="[10,25,50]"></mfBootstrapPaginator>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

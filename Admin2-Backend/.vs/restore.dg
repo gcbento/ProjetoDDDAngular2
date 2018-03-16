@@ -1,0 +1,16 @@
+#:C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Data\Admin2.Data.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Data\Admin2.Data.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Domain\Admin2.Domain.xproj
+#:C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.IoC\Admin2.IoC.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.IoC\Admin2.IoC.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.AppServices\Admin2.AppServices.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.IoC\Admin2.IoC.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Data\Admin2.Data.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.IoC\Admin2.IoC.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Domain\Admin2.Domain.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.AppServices\Admin2.AppServices.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Domain\Admin2.Domain.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Data\Admin2.Data.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Domain\Admin2.Domain.xproj
+#:C:\projetos\Admin2.0\Admin2-Backend\src\Admin2\Admin2.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2\Admin2.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.AppServices\Admin2.AppServices.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2\Admin2.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.IoC\Admin2.IoC.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.AppServices\Admin2.AppServices.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Domain\Admin2.Domain.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.IoC\Admin2.IoC.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.AppServices\Admin2.AppServices.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.IoC\Admin2.IoC.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Data\Admin2.Data.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.IoC\Admin2.IoC.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Domain\Admin2.Domain.xproj
+C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Data\Admin2.Data.xproj|C:\projetos\Admin2.0\Admin2-Backend\src\Admin2.Domain\Admin2.Domain.xproj

@@ -1,0 +1,321 @@
+<simple-notifications></simple-notifications>
+
+<div bsModal #locacaoRapidaModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Estender Locação</h4>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="vendaForm" (ngSubmit)="saveLocacao()">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group" [class.has-error]="hasError(vendaForm.controls['dataVenda'])">
+                <label>Data Venda</label>
+                <div class="row">
+                  <div class="col-md-12">
+                    <datepicker-ionic [(ngModel)]="venda.dataVenda" name="dataVenda" formControlName="dataVenda" singleSelect viewFormat="DD/MM/YYYY"
+                      [expanded]="true"></datepicker-ionic>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group" [class.has-error]="hasError(vendaForm.controls['valor'])">
+                <label>Valor</label>
+                <input class="form-control" type="text" [(ngModel)]="itemVenda.valor" name="valor" formControlName="valor">
+                <p *ngIf="vendaForm.controls['valor'].errors?.number">Somente números</p>
+              </div>
+              <div class="form-group">
+                <label>Qtde dias</label>
+                <input class="form-control" type="text" [(ngModel)]="itemVenda.qtdeDias" name="qtdeDias" formControlName="qtdeDias">
+                <p *ngIf="vendaForm.controls['qtdeDias'].errors?.number">Somente números</p>
+              </div>
+              <div class="checkbox">
+                <label>
+                    <input type="checkbox" [(ngModel)]="itemVenda.diasGratis" name="diasGratis" formControlName="diasGratis"> Dias Grátis
+                </label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group" [class.has-error]="hasError(vendaForm.controls['selectClientes'])">
+                <label>Cliente</label>
+                <ng-select placeholder="Selecione" [(ngModel)]="venda.cliente.id" name="selectClientes" [options]="clienteOptions" [allowClear]="true"
+                  formControlName="selectClientes"></ng-select>
+              </div>
+              <div class="form-group">
+                <button type="button" class="btn btn-primary" (click)="isAddCliente = !isAddCliente">Add cliente</button>
+
+                <div class="row" [collapse]="isAddCliente">
+                  <div class="form-group col-md-6">
+                    <label>Cliente</label>
+                    <input class="form-control" type="text" name="nome" [(ngModel)]="venda.cliente.nome" formControlName="cliente">
+                  </div>
+                  <div class="form-group col-md-6">
+                    <label>Email</label>
+                    <input class="form-control" type="text" name="email" [(ngModel)]="venda.cliente.email" formControlName="email">
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Senha</label>
+                <div class="input-group">
+                  <input class="form-control" type="text" [(ngModel)]="itemVenda.senha" name="senha" formControlName="senha">
+                  <span class="input-group-btn">
+                      <button class="btn btn-default" type="button" (click)="gerarSenha()">Gerar senha</button>
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="form-group form-actions">
+            <button type="button" class="btn btn-default" (click)="hideModal()">Cancelar</button>
+            <button type="submit" class="btn btn-primary" [disabled]="!vendaForm.valid">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #estenderLocacaoModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Estender Locação</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="form-group col-md-6">
+            <label>Qtde dias</label>
+            <input class="form-control" type="text" name="qtdeDias" [(ngModel)]="itemVenda.qtdeDias">
+          </div>
+          <div class="form-group col-md-6">
+            <label>Valor</label>
+            <input class="form-control" type="text" name="valor" [(ngModel)]="itemVenda.valor">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" (click)="hideModal()">Cancelar</button>
+        <button type="submit" class="btn btn-primary" (click)="estenderLocacao()">Confimar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #finalizarLocacaoModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Finalizar Locação</h4>
+      </div>
+      <div class="modal-body">
+        Deseja realmente finalizar esta locacão?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" (click)="hideModal()">Não</button>
+        <button type="button" class="btn btn-primary" (click)="finalizarLocacao()">Sim</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #confirmarDesativacaoModal="bs-modal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="hideModal()"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Confirmar Desativacao</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Data Desativação</label>
+          <div class="row">
+            <div class="col-md-12">
+              <datepicker-ionic [(ngModel)]="conta.dataDesativacao" name="dataDesativacao" singleSelect
+                viewFormat="DD/MM/YYYY" [expanded]="true"></datepicker-ionic>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" (click)="hideModal()">Não</button>
+        <button type="button" class="btn btn-primary" (click)="confirmarDesativacao()">Sim</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div *ngFor="let saldo of saldoMes; let index=index" class="col-md-6">
+    <div class="content-box-large">
+      <div class="panel panel-primary">
+        <div class="panel-heading"><span [innerHtml]="getTitleSaldo(index)"></span></div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12">
+
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Compras</th>
+                    <th>Vendas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>Valor</b></td>
+                    <td>{{saldo.valorTotalCompras | currency:'BRL':true}}</td>
+                    <td>{{saldo.valorTotalVendas | currency:'BRL':true}}</td>
+                  </tr>
+                  <tr>
+                    <td><b>Qtde</b></td>
+                    <td>{{saldo.qtdeTotalCompras}}</td>
+                    <td>{{saldo.qtdeTotalVendas}}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h3 class="text-center">
+                <span [ngClass]="getClassSaldo(saldo.valorTotalVendas - saldo.valorTotalCompras)">
+                  {{saldo.valorTotalVendas - saldo.valorTotalCompras | currency:'BRL':true:'1.2-2'}}
+                </span>
+              </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="content-box-large">
+      <div class="panel-body">
+        <tabset type="tabs">
+
+          <!--Finas de locação-->
+          <tab>
+            <template tabHeading>
+              Finais de locação <span class="badge">{{fimLocacoes.length}}</span>
+            </template>
+            <a [routerLink]="['/vendas/true']">Ver todas as locações</a>
+            <h3 *ngIf="fimLocacoes.length <= 0">
+              Não há locações pra encerrar entre hoje e amanhã.
+            </h3>
+            <table *ngIf="fimLocacoes.length > 0" class="table table-hover" [mfData]="fimLocacoes" #mf="mfDataTable" [mfRowsOnPage]="5">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Email</th>
+                  <th>Cliente</th>
+                  <th>Valor</th>
+                  <th>Qtade dias</th>
+                  <th>Inicio Locação</th>
+                  <th>Fim Locação</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of mf.data">
+                  <td><img src="./assets/img/{{item.conta.jogos[0]?.descricao | nomeImg}}.jpg"></td>
+                  <td>{{item.conta.email}}</td>
+                  <td>{{item.venda.cliente.nome | tamText}}</td>
+                  <td>{{item.valor | currency:'BRL':true}}</td>
+                  <td>{{item.qtdeDias}}</td>
+                  <td>{{item.inicioLocacao | amDateFormat: 'DD/MM/YYYY'}}</td>
+                  <td>{{item.fimLocacao | amDateFormat: 'DD/MM/YYYY'}}</td>
+                  <td>
+                    <a class="btn-link" (click)="showEstenderLocacaoModal(item.id)" tooltipPlacement="top" tooltip="Add dias"><i class="fa fa-plus blue"></i></a>
+                    <a class="btn-link" (click)="showFinalizarLocacaoModal(item.id)" tooltipPlacement="top" tooltip="Encerrar locação"><i class="fa fa-close red"></i></a>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="8">
+                    <mfBootstrapPaginator></mfBootstrapPaginator>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </tab>
+
+          <!--Contas pra alugar-->
+          <tab>
+            <template tabHeading>
+              Contas Disponíveis pra locação <span class="badge">{{contasDisponiveis.length}}</span>
+            </template>
+            <table class="table table-hover" [mfData]="contasDisponiveis" #cd="mfDataTable" [mfRowsOnPage]="5">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Email</th>
+                  <th>Senha</th>
+                  <th>Fim Locação</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of cd.data">
+                  <td><img src="./assets/img/{{item.conta.jogos[0]?.descricao | nomeImg}}.jpg"></td>
+                  <td>{{item.conta.email}}</td>
+                  <td>{{item.senha}}</td>
+                  <td>{{item.fimLocacao | amDateFormat: 'DD/MM/YYYY' | checkEmptyValue}}</td>
+                  <td>
+                    <a class="btn-link" (click)="showLocacaoRapidaModal(item.conta.id)" tooltipPlacement="top" tooltip="Alugar"><i class="fa fa-share-square-o"></i></a>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="4">
+                    <mfBootstrapPaginator></mfBootstrapPaginator>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </tab>
+
+          <!--Contas pra desativar-->
+          <tab>
+            <template tabHeading>
+              Contas Pra desativar <span class="badge">{{contasDesativar.length}}</span>
+            </template>
+            <table class="table table-hover" [mfData]="contasDesativar" #de="mfDataTable" [mfRowsOnPage]="5">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Email</th>
+                  <th>Data desativar</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of de.data" [ngClass]="checkDataDesativacao(item.dataDesativacao)">
+                  <td><img src="./assets/img/{{item.jogos[0]?.descricao | nomeImg}}.jpg"></td>
+                  <td>{{item.email}}</td>
+                  <td>{{item.dataDesativacao | addDatePart:'6':'month' | amDateFormat:'DD/MM/YYYY'}}</td>
+                  <td><button [disabled]="isDesativacao(item.dataDesativacao)" class="btn-link" (click)="showConfirmarDesativacaoModal(item)" tooltip="Confirmar Desativação"><i class="fa fa-check"></i></button></td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="4">
+                    <mfBootstrapPaginator></mfBootstrapPaginator>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </tab>
+        </tabset>
+      </div>
+    </div>
+  </div>
+</div>
